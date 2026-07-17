@@ -30,10 +30,9 @@ check_root() {
 check_os() {
   if [[ ! -f /etc/almalinux-release ]]; then
     warn "Bu sistem AlmaLinux deyil. Script yalnız AlmaLinux 8 üçün test edilib."
-    read -rp "Davam etmək istəyirsiniz? (y/N): " confirm
-    [[ "$confirm" != "y" && "$confirm" != "Y" ]] && exit 0
+    warn "Davam edilir..."
   fi
-}
+}$
 
 install_dependencies() {
   header "Sistem paketlərini yükləyir"
