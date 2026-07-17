@@ -32,7 +32,7 @@ check_os() {
     warn "Bu sistem AlmaLinux deyil. Script yalnız AlmaLinux 8 üçün test edilib."
     warn "Davam edilir..."
   fi
-}$
+}
 
 install_dependencies() {
   header "Sistem paketlərini yükləyir"
