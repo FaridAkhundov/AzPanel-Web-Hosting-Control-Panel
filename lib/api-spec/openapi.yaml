@@ -1,0 +1,794 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Web Hosting Control Panel API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: stats
+    description: Server and dashboard statistics
+  - name: domains
+    description: Domain and virtual host management
+  - name: databases
+    description: MySQL/MariaDB database management
+  - name: emails
+    description: Email account management
+  - name: ftp
+    description: FTP account management
+  - name: ssl
+    description: SSL certificate management
+  - name: dns
+    description: DNS record management
+  - name: users
+    description: Panel user management
+  - name: backups
+    description: Backup management
+  - name: activity
+    description: Activity log
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /stats:
+    get:
+      operationId: getServerStats
+      tags: [stats]
+      summary: Get server resource statistics
+      responses:
+        "200":
+          description: Server stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerStats"
+
+  /activity:
+    get:
+      operationId: listActivity
+      tags: [activity]
+      summary: List recent activity events
+      responses:
+        "200":
+          description: Activity list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityEvent"
+
+  /domains:
+    get:
+      operationId: listDomains
+      tags: [domains]
+      summary: List all domains
+      responses:
+        "200":
+          description: Domain list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Domain"
+    post:
+      operationId: createDomain
+      tags: [domains]
+      summary: Add a new domain
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DomainInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Domain"
+
+  /domains/{id}:
+    get:
+      operationId: getDomain
+      tags: [domains]
+      summary: Get domain details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Domain
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Domain"
+    delete:
+      operationId: deleteDomain
+      tags: [domains]
+      summary: Delete a domain
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /domains/{id}/stats:
+    get:
+      operationId: getDomainStats
+      tags: [domains]
+      summary: Get bandwidth and request stats for a domain
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Domain stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DomainStats"
+
+  /databases:
+    get:
+      operationId: listDatabases
+      tags: [databases]
+      summary: List all databases
+      responses:
+        "200":
+          description: Database list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Database"
+    post:
+      operationId: createDatabase
+      tags: [databases]
+      summary: Create a new database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DatabaseInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Database"
+
+  /databases/{id}:
+    delete:
+      operationId: deleteDatabase
+      tags: [databases]
+      summary: Delete a database
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /emails:
+    get:
+      operationId: listEmails
+      tags: [emails]
+      summary: List all email accounts
+      responses:
+        "200":
+          description: Email account list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EmailAccount"
+    post:
+      operationId: createEmail
+      tags: [emails]
+      summary: Create a new email account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailAccount"
+
+  /emails/{id}:
+    delete:
+      operationId: deleteEmail
+      tags: [emails]
+      summary: Delete an email account
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /ftp:
+    get:
+      operationId: listFtp
+      tags: [ftp]
+      summary: List all FTP accounts
+      responses:
+        "200":
+          description: FTP account list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FtpAccount"
+    post:
+      operationId: createFtp
+      tags: [ftp]
+      summary: Create a new FTP account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FtpInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FtpAccount"
+
+  /ftp/{id}:
+    delete:
+      operationId: deleteFtp
+      tags: [ftp]
+      summary: Delete an FTP account
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /ssl:
+    get:
+      operationId: listSsl
+      tags: [ssl]
+      summary: List all SSL certificates
+      responses:
+        "200":
+          description: SSL cert list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SslCert"
+    post:
+      operationId: createSsl
+      tags: [ssl]
+      summary: Add or request an SSL certificate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SslInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SslCert"
+
+  /ssl/{id}:
+    delete:
+      operationId: deleteSsl
+      tags: [ssl]
+      summary: Delete an SSL certificate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /dns/{domainId}:
+    get:
+      operationId: listDns
+      tags: [dns]
+      summary: List DNS records for a domain
+      parameters:
+        - name: domainId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: DNS record list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DnsRecord"
+    post:
+      operationId: createDns
+      tags: [dns]
+      summary: Add a DNS record
+      parameters:
+        - name: domainId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DnsInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DnsRecord"
+
+  /dns/{domainId}/{recordId}:
+    delete:
+      operationId: deleteDns
+      tags: [dns]
+      summary: Delete a DNS record
+      parameters:
+        - name: domainId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: recordId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List all panel users
+      responses:
+        "200":
+          description: User list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PanelUser"
+    post:
+      operationId: createUser
+      tags: [users]
+      summary: Create a panel user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PanelUser"
+
+  /users/{id}:
+    delete:
+      operationId: deleteUser
+      tags: [users]
+      summary: Delete a panel user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /backups:
+    get:
+      operationId: listBackups
+      tags: [backups]
+      summary: List all backups
+      responses:
+        "200":
+          description: Backup list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Backup"
+    post:
+      operationId: createBackup
+      tags: [backups]
+      summary: Create a new backup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BackupInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Backup"
+
+  /backups/{id}:
+    delete:
+      operationId: deleteBackup
+      tags: [backups]
+      summary: Delete a backup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required: [status]
+
+    ServerStats:
+      type: object
+      required: [cpuUsage, ramUsed, ramTotal, diskUsed, diskTotal, uptime, domainCount, dbCount, emailCount, activeServices]
+      properties:
+        cpuUsage:
+          type: number
+        ramUsed:
+          type: number
+        ramTotal:
+          type: number
+        diskUsed:
+          type: number
+        diskTotal:
+          type: number
+        uptime:
+          type: string
+        domainCount:
+          type: integer
+        dbCount:
+          type: integer
+        emailCount:
+          type: integer
+        activeServices:
+          type: integer
+
+    ActivityEvent:
+      type: object
+      required: [id, action, resource, createdAt]
+      properties:
+        id:
+          type: integer
+        action:
+          type: string
+        resource:
+          type: string
+        detail:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    Domain:
+      type: object
+      required: [id, name, documentRoot, phpVersion, status, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        documentRoot:
+          type: string
+        phpVersion:
+          type: string
+        status:
+          type: string
+        sslEnabled:
+          type: boolean
+        createdAt:
+          type: string
+
+    DomainInput:
+      type: object
+      required: [name, documentRoot, phpVersion]
+      properties:
+        name:
+          type: string
+        documentRoot:
+          type: string
+        phpVersion:
+          type: string
+
+    DomainStats:
+      type: object
+      required: [domainId, requestsToday, bandwidthToday, requestsMonth, bandwidthMonth]
+      properties:
+        domainId:
+          type: integer
+        requestsToday:
+          type: integer
+        bandwidthToday:
+          type: number
+        requestsMonth:
+          type: integer
+        bandwidthMonth:
+          type: number
+
+    Database:
+      type: object
+      required: [id, name, dbUser, size, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        dbUser:
+          type: string
+        size:
+          type: number
+        createdAt:
+          type: string
+
+    DatabaseInput:
+      type: object
+      required: [name, dbUser, password]
+      properties:
+        name:
+          type: string
+        dbUser:
+          type: string
+        password:
+          type: string
+
+    EmailAccount:
+      type: object
+      required: [id, address, domain, quota, used, createdAt]
+      properties:
+        id:
+          type: integer
+        address:
+          type: string
+        domain:
+          type: string
+        quota:
+          type: integer
+        used:
+          type: number
+        createdAt:
+          type: string
+
+    EmailInput:
+      type: object
+      required: [address, domain, password, quota]
+      properties:
+        address:
+          type: string
+        domain:
+          type: string
+        password:
+          type: string
+        quota:
+          type: integer
+
+    FtpAccount:
+      type: object
+      required: [id, username, directory, createdAt]
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        directory:
+          type: string
+        createdAt:
+          type: string
+
+    FtpInput:
+      type: object
+      required: [username, password, directory]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        directory:
+          type: string
+
+    SslCert:
+      type: object
+      required: [id, domain, issuer, expiresAt, status, createdAt]
+      properties:
+        id:
+          type: integer
+        domain:
+          type: string
+        issuer:
+          type: string
+        expiresAt:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+
+    SslInput:
+      type: object
+      required: [domain, type]
+      properties:
+        domain:
+          type: string
+        type:
+          type: string
+
+    DnsRecord:
+      type: object
+      required: [id, domainId, type, name, value, ttl, createdAt]
+      properties:
+        id:
+          type: integer
+        domainId:
+          type: integer
+        type:
+          type: string
+        name:
+          type: string
+        value:
+          type: string
+        ttl:
+          type: integer
+        priority:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+
+    DnsInput:
+      type: object
+      required: [type, name, value, ttl]
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+        value:
+          type: string
+        ttl:
+          type: integer
+        priority:
+          type: ["integer", "null"]
+
+    PanelUser:
+      type: object
+      required: [id, username, email, role, createdAt]
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        createdAt:
+          type: string
+
+    UserInput:
+      type: object
+      required: [username, email, password, role]
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+
+    Backup:
+      type: object
+      required: [id, name, type, size, status, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+        size:
+          type: number
+        status:
+          type: string
+        createdAt:
+          type: string
+
+    BackupInput:
+      type: object
+      required: [name, type]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        domainId:
+          type: ["integer", "null"]
